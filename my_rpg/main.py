@@ -2,7 +2,9 @@ import pygame
 import json
 import os
 import random
-
+from engine.fighter import Fighter
+from engine.data_loader import load_characters, load_moves
+from engine.scene_manager import Scene, SceneManager
 pygame.init()
 screen = pygame.display.set_mode((800, 576))
 pygame.display.set_caption("Red Box")
@@ -54,46 +56,13 @@ def build_map():
     return game_map
 GAME_MAP = build_map()
 
-def load_characters():
-    with open("data/characters.json") as f:
-        data = json.load(f)
-    return data
-
-def load_moves():
-    with open("data/moves.json") as f:
-        data = json.load(f)
-    return data
 
 
-
-class Fighter:
-    def __init__(self, data):
-        self.name = data["name"]
-        self.hp = data["hp"]
-        self.type = data["type"]
-        self.attack = data["attack"]
-        self.defense = data["defense"]
-        self.moves = data["moves"]
-    def is_alive(self):
-        if self.hp > 0:
-            return True
-        else: return False
 
 moves_data = load_moves()
 characters = load_characters()
 reggie = Fighter(characters["reggie"])
 skivvy = Fighter(characters["random_eshay"])
-
-
-
-
-class Scene: #contains an even, update and draw.
-    def handle_event(self, event): #  is a blank template — a contract. It lists the three things every scene must be able to do but does none of them (all pass)
-        pass
-    def update(self):
-        pass
-    def draw(self, screen):
-        pass
 
 
 class Title(Scene):
@@ -236,29 +205,6 @@ class Battle(Scene):
                     manager.goto_scene(title)
                 else:
                     manager.goto_scene(background)
-
-
-
-
-
-
-
-
-
-
-class SceneManager:
-    def __init__(self, start_scene):
-        self.current = start_scene
-    def handle_event(self, event):
-        self.current.handle_event(event)
-    def update(self):
-        self.current.update()
-    def goto_scene(self, new_scene):
-        self.current = new_scene
-    def draw(self, screen):
-        self.current.draw(screen)
-
-
 
 title = Title()
 
