@@ -26,6 +26,36 @@ for row in range(MAP_ROWS):
             line.append(0)
     GAME_MAP.append(line)
 
+# Corridor walls (horizontal, splitting the map)
+for col in range(1, 24):
+    GAME_MAP[8][col] = 1
+
+# Doorway in the corridor
+GAME_MAP[8][12] = 0
+GAME_MAP[8][13] = 0
+
+# Top room - left block (classroom)
+for row in range(3, 8):
+    GAME_MAP[row][5] = 1
+    GAME_MAP[row][6] = 1
+
+# Top room - right block (another room)
+for row in range(3, 7):
+    GAME_MAP[row][18] = 1
+    GAME_MAP[row][19] = 1
+
+# Bottom area obstacles
+GAME_MAP[12][8] = 1
+GAME_MAP[12][9] = 1
+GAME_MAP[13][8] = 1
+GAME_MAP[14][15] = 1
+GAME_MAP[14][16] = 1
+
+# Battle triggers
+GAME_MAP[5][12] = 3    # top area
+GAME_MAP[14][22] = 3   # bottom right
+GAME_MAP[10][4] = 3    # bottom left
+
 
 def load_characters():
     with open("data/characters.json") as f:
