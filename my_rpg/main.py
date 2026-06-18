@@ -4,26 +4,27 @@ import os
 import random
 
 pygame.init()
-screen = pygame.display.set_mode((800, 600))
+screen = pygame.display.set_mode((800, 576))
 pygame.display.set_caption("Red Box")
 clock = pygame.time.Clock()
 
 SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_HEIGHT = 576
 PLAYER_SIZE = 32
 PLAYER_SPEED = 4
 TILE_SIZE = 32
-GAME_MAP = [
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 3, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 1, 1, 0, 0, 0, 0, 1],
-    [1, 0, 0, 1, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-]
+MAP_COLS = SCREEN_WIDTH // TILE_SIZE    # 25
+MAP_ROWS = SCREEN_HEIGHT // TILE_SIZE   # 18
+
+GAME_MAP = []
+for row in range(MAP_ROWS):
+    line = []
+    for col in range(MAP_COLS):
+        if row == 0 or row == MAP_ROWS - 1 or col == 0 or col == MAP_COLS - 1:
+            line.append(1)
+        else:
+            line.append(0)
+    GAME_MAP.append(line)
 
 
 def load_characters():
