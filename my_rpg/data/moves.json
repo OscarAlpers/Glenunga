@@ -1,0 +1,18 @@
+{
+    "ragebait": {
+        "name": "Ragebait",
+        "power": 12
+    },
+    "baby noise": {
+        "name": "Baby noise",
+        "power": 4
+    },
+    "shank": {
+        "name": "Shank",
+        "power": 15
+    },
+    "cigarette burn": {
+        "name": "Cigarette burn",
+        "power": 6
+    }
+}

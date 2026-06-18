@@ -1,0 +1,18 @@
+{
+    "reggie": {
+        "name": "Reggie",
+        "type": "dickhead",
+        "hp": 30,
+        "attack": 8,
+        "defense": 5,
+        "moves": ["ragebait", "baby noise"]
+    },
+    "random_eshay": {
+        "name": "Skivvy",
+        "type": "eshay",
+        "hp": 25,
+        "attack": 10,
+        "defense": 3,
+        "moves": ["shank", "cigarette burn"]
+    }
+}
