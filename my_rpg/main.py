@@ -16,46 +16,43 @@ TILE_SIZE = 32
 MAP_COLS = SCREEN_WIDTH // TILE_SIZE    # 25
 MAP_ROWS = SCREEN_HEIGHT // TILE_SIZE   # 18
 
-GAME_MAP = []
-for row in range(MAP_ROWS):
-    line = []
-    for col in range(MAP_COLS):
-        if row == 0 or row == MAP_ROWS - 1 or col == 0 or col == MAP_COLS - 1:
-            line.append(1)
-        else:
-            line.append(0)
-    GAME_MAP.append(line)
 
-# Corridor walls (horizontal, splitting the map)
-for col in range(1, 24):
-    GAME_MAP[8][col] = 1
+def build_map():
+    game_map = []
+    for row in range(MAP_ROWS):
+        line = []
+        for col in range(MAP_COLS):
+            if row == 0 or row == MAP_ROWS - 1 or col == 0 or col == MAP_COLS - 1:
+                line.append(1)
+            else:
+                line.append(0)
+        game_map.append(line)
 
-# Doorway in the corridor
-GAME_MAP[8][12] = 0
-GAME_MAP[8][13] = 0
+    for col in range(1, 24):
+        game_map[8][col] = 1
+    game_map[8][12] = 0
+    game_map[8][13] = 0
 
-# Top room - left block (classroom)
-for row in range(3, 8):
-    GAME_MAP[row][5] = 1
-    GAME_MAP[row][6] = 1
+    for row in range(3, 8):
+        game_map[row][5] = 1
+        game_map[row][6] = 1
 
-# Top room - right block (another room)
-for row in range(3, 7):
-    GAME_MAP[row][18] = 1
-    GAME_MAP[row][19] = 1
+    for row in range(3, 7):
+        game_map[row][18] = 1
+        game_map[row][19] = 1
 
-# Bottom area obstacles
-GAME_MAP[12][8] = 1
-GAME_MAP[12][9] = 1
-GAME_MAP[13][8] = 1
-GAME_MAP[14][15] = 1
-GAME_MAP[14][16] = 1
+    game_map[12][8] = 1
+    game_map[12][9] = 1
+    game_map[13][8] = 1
+    game_map[14][15] = 1
+    game_map[14][16] = 1
 
-# Battle triggers
-GAME_MAP[5][12] = 3    # top area
-GAME_MAP[14][22] = 3   # bottom right
-GAME_MAP[10][4] = 3    # bottom left
+    game_map[5][12] = 3
+    game_map[14][22] = 3
+    game_map[10][4] = 3
 
+    return game_map
+GAME_MAP = build_map()
 
 def load_characters():
     with open("data/characters.json") as f:
@@ -230,7 +227,15 @@ class Battle(Scene):
                     self.battle_over = True
         if self.battle_over:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                manager.goto_scene(background)
+                if not self.player.is_alive():
+                    self.player.hp = characters["reggie"]["hp"]
+                    GAME_MAP.clear()
+                    GAME_MAP.extend(build_map())
+                    background.x = 64
+                    background.y = 64
+                    manager.goto_scene(title)
+                else:
+                    manager.goto_scene(background)
 
 
 
