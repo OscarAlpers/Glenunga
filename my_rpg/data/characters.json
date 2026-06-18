@@ -10,7 +10,7 @@
     "random_eshay": {
         "name": "Skivvy",
         "type": "eshay",
-        "hp": 25,
+        "hp": 15,
         "attack": 10,
         "defense": 3,
         "moves": ["shank", "cigarette burn"]

@@ -173,7 +173,9 @@ class Background(Scene):
         tile_row = center_y // TILE_SIZE
         if GAME_MAP[tile_row][tile_column] == 3:
             GAME_MAP[tile_row][tile_column] = 0
-            manager.goto_scene(battle)
+            enemy = Fighter(characters["random_eshay"])
+            new_battle = Battle(reggie,enemy)
+            manager.goto_scene(new_battle)
 
 class Battle(Scene):
     def __init__(self, player, enemy):
