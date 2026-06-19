@@ -1,18 +1,72 @@
 {
     "ragebait": {
         "name": "Ragebait",
-        "power": 12
+        "power": 12,
+        "type": "dickhead"
     },
     "baby noise": {
         "name": "Baby noise",
-        "power": 4
+        "power": 4,
+        "type": "dickhead"
     },
     "shank": {
         "name": "Shank",
-        "power": 15
+        "power": 15,
+        "type": "eshay"
     },
     "cigarette burn": {
         "name": "Cigarette burn",
-        "power": 6
+        "power": 6,
+        "type": "eshay"
+    },
+    "weak punch": {
+        "name": "Weak punch",
+        "power": 40,
+        "type": "neutral"
+    },
+    "throw rubbish": {
+        "name": "Throw rubbish",
+        "power": 60,
+        "type": "neutral"
+    },
+    "bicycle kick": {
+        "name": "Bicycle kick",
+        "power": 14,
+        "type": "sporty"
+    },
+    "sprint": {
+        "name": "Sprint",
+        "power": 8,
+        "type": "sporty"
+    },
+    "bong rip": {
+        "name": "Bong rip",
+        "power": 4,
+        "type": "stoner"
+    },
+    "bong smash": {
+        "name": "Bong smash",
+        "power": 12,
+        "type": "stoner"
+    },
+    "bali threesome story": {
+        "name": "Bali threesome story",
+        "power": 6,
+        "type": "dickhead"
+    },
+    "keef and stem": {
+        "name": "Keef and stem",
+        "power": 3,
+        "type": "stoner"
+    },
+    "cry": {
+        "name": "Cry",
+        "power": 0,
+        "type": "neutral"
+    },
+    "squeal": {
+        "name": "Squeal",
+        "power": 1,
+        "type": "neutral"
     }
 }

@@ -3,7 +3,7 @@ import json
 import os
 import random
 from engine.fighter import Fighter
-from engine.data_loader import load_characters, load_moves
+from engine.data_loader import load_characters, load_moves, load_dialogue
 from engine.scene_manager import Scene, SceneManager
 pygame.init()
 screen = pygame.display.set_mode((800, 576))
@@ -15,11 +15,37 @@ SCREEN_HEIGHT = 576
 PLAYER_SIZE = 32
 PLAYER_SPEED = 4
 TILE_SIZE = 32
-MAP_COLS = SCREEN_WIDTH // TILE_SIZE    # 25
-MAP_ROWS = SCREEN_HEIGHT // TILE_SIZE   # 18
+MAP_COLS = 50   # 25
+MAP_ROWS = 36   # 18
 
+TILE_COLORS = {
+    0: (222, 184, 135),     # floor
+    1: (44, 53, 74),    # wall
+    3: (181, 72, 80),      # eshay fight
+    101: (163, 7, 18),     # nick fight
+    102: (163, 7, 18), #dev fight
+    9: (222, 184, 135),      # door
+}
 
-def build_map():
+enemies = {
+    3: "random_eshay",
+    101: "nick",
+    102: "dev"
+}
+type_chart = {
+    "dickhead": {"cunt": 1.5, "sket": 0.5},
+    "nerd": {"sporty": 1.5, "cunt": 0.5, "sket": 0.5},
+    "sporty": {"eshay": 1.5},
+    "stoner": {},
+    "eshay": {"nerd": 1.5, "sporty": 0.5},
+    "prefect": {"cunt": 1.5, "eshay": 1.5},
+    "cunt": {"nerd": 1.5, "prefect": 0.5},
+    "sket": {"nerd": 1.5, "cunt": 1.5, "sporty": 1.5, "dickhead": 0.5},
+    "loser": {"prefect":0.5, "stoner" : 1.5},
+    "behemoth": {"sporty": 1.5, "sket": 1.5, "eshay": 1.5}
+}
+
+def build_map(area="map1"):
     game_map = []
     for row in range(MAP_ROWS):
         line = []
@@ -29,39 +55,48 @@ def build_map():
             else:
                 line.append(0)
         game_map.append(line)
+    if area == "map1":
+        for col in range(1, 24):
+            game_map[8][col] = 1
+        game_map[8][12] = 0
+        game_map[8][13] = 0
 
-    for col in range(1, 24):
-        game_map[8][col] = 1
-    game_map[8][12] = 0
-    game_map[8][13] = 0
+        for row in range(3, 8):
+            game_map[row][5] = 1
+            game_map[row][6] = 1
 
-    for row in range(3, 8):
-        game_map[row][5] = 1
-        game_map[row][6] = 1
+        for row in range(3, 7):
+            game_map[row][18] = 1
+            game_map[row][19] = 1
 
-    for row in range(3, 7):
-        game_map[row][18] = 1
-        game_map[row][19] = 1
+        game_map[12][8] = 1
+        game_map[12][9] = 1
+        game_map[13][8] = 1
+        game_map[14][15] = 1
+        game_map[14][16] = 1
 
-    game_map[12][8] = 1
-    game_map[12][9] = 1
-    game_map[13][8] = 1
-    game_map[14][15] = 1
-    game_map[14][16] = 1
-
-    game_map[5][12] = 3
-    game_map[14][22] = 3
-    game_map[10][4] = 3
-
+        game_map[5][12] = 3
+        game_map[14][22] = 101
+        game_map[10][4] = 102
+        game_map[24][49] = 9
+        game_map[23][49] = 9
+        game_map[25][49] = 9
+    elif area == "map2":
+        game_map[13][0] = 0
+        game_map[14][0] = 0
+        game_map[15][0] = 0
+        game_map[3][24] = 9
+        game_map[4][24] = 9
+        game_map[5][24] = 9
+        game_map[10][4] = 102
     return game_map
 GAME_MAP = build_map()
 
 
-
-
 moves_data = load_moves()
 characters = load_characters()
-reggie = Fighter(characters["reggie"])
+dialogue_data = load_dialogue()
+player = Fighter(characters["player"])
 skivvy = Fighter(characters["random_eshay"])
 
 
@@ -74,7 +109,7 @@ class Title(Scene):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_a:
             print("Youve pressed the A key!")
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-            manager.goto_scene(background)
+            manager.goto_scene(intro)
     def update(self):
         pass
     def draw(self, screen):
@@ -88,23 +123,23 @@ class Background(Scene):
     def __init__(self):
         self.x = 64
         self.y = 64
+        self.camera_x = 0
+        self.camera_y = 0
     def draw(self, screen):
         screen.fill((0, 0, 0))
         for row_index, row in enumerate(GAME_MAP):
-            y = row_index * TILE_SIZE
+            y = row_index * TILE_SIZE - self.camera_y
             for col_index, col in enumerate(row):
-                x = col_index * TILE_SIZE
-                if col == 1:
-                    pygame.draw.rect(screen, (100, 255, 255), pygame.Rect(x, y, TILE_SIZE, TILE_SIZE))
-                elif col == 0:
-                    pygame.draw.rect(screen, (50, 100, 255), pygame.Rect(x, y, TILE_SIZE, TILE_SIZE))
-                else:
-                    pygame.draw.rect(screen, (200, 0, 207), pygame.Rect(x, y, TILE_SIZE, TILE_SIZE))
-        pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, PLAYER_SIZE, PLAYER_SIZE))
+                x = col_index * TILE_SIZE - self.camera_x
+                color = TILE_COLORS.get(col, (50, 100, 255))
+                pygame.draw.rect(screen, color, (x, y, TILE_SIZE, TILE_SIZE))
+        pygame.draw.rect(screen, (48, 54, 240), (self.x - self.camera_x, self.y - self.camera_y, PLAYER_SIZE, PLAYER_SIZE))
     def is_walkable(self, x, y):
-        tile_column = x // TILE_SIZE
-        tile_row = y // TILE_SIZE
-        return GAME_MAP[tile_row][tile_column] != 1
+        col = x // TILE_SIZE
+        row = y // TILE_SIZE
+        if row < 0 or row >= MAP_ROWS or col < 0 or col >= MAP_COLS:
+            return False
+        return GAME_MAP[row][col] != 1
     def update(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
@@ -129,19 +164,26 @@ class Background(Scene):
             self.x = 0
         if self.y < 0:
             self.y = 0
-        if self.x > SCREEN_WIDTH - PLAYER_SIZE:
-            self.x = (SCREEN_WIDTH - PLAYER_SIZE)
-        if self.y > SCREEN_HEIGHT - PLAYER_SIZE:
-            self.y = (SCREEN_HEIGHT - PLAYER_SIZE)
         center_x = self.x + PLAYER_SIZE // 2
         center_y = self.y + PLAYER_SIZE // 2
         tile_column = center_x // TILE_SIZE
         tile_row = center_y // TILE_SIZE
-        if GAME_MAP[tile_row][tile_column] == 3:
+        tile_value = GAME_MAP[tile_row][tile_column]
+        self.camera_x = self.x - SCREEN_WIDTH // 2
+        self.camera_y = self.y - SCREEN_HEIGHT // 2
+
+        if tile_value in enemies:
             GAME_MAP[tile_row][tile_column] = 0
-            enemy = Fighter(characters["random_eshay"])
-            new_battle = Battle(reggie,enemy)
+            enemy = Fighter(characters[enemies[tile_value]])
+            new_battle = Battle(player, enemy)
             manager.goto_scene(new_battle)
+
+        elif tile_value == 9:
+            GAME_MAP.clear()
+            GAME_MAP.extend(build_map("map2"))
+            self.x = TILE_SIZE
+            self.y = 14 * TILE_SIZE
+
 
 class Battle(Scene):
     def __init__(self, player, enemy):
@@ -153,7 +195,7 @@ class Battle(Scene):
         self.selected = 0
         self.battle_over = False
     def draw(self, screen):
-        screen.fill((200, 0, 207))
+        screen.fill((32, 46, 12))
         text = self.small_font.render(f"{self.player.name} HP: {self.player.hp}", True, (255, 255, 255))
         screen.blit(text, (50, 50))
         text = self.small_font.render(f"{self.enemy.name} HP: {self.enemy.hp}", True, (255, 255, 255))
@@ -164,9 +206,9 @@ class Battle(Scene):
             else:
                 color = (255, 255, 255)
             move_text = self.small_font.render(move, True, color)
-            screen.blit(move_text, (50,300 + i * 40))
+            screen.blit(move_text, (50,200 + i * 40))
         text = self.battle_font.render(self.message, True, (255, 255, 255))
-        screen.blit(text, (10, 400))
+        screen.blit(text, (50, 460))
         if self.battle_over:
             text = self.small_font.render(self.message, True, (255, 255, 255))
             screen.blit(text, (10, 600))
@@ -184,7 +226,11 @@ class Battle(Scene):
                 move_name = self.player.moves[self.selected]
                 enemy_move = random.choice(self.enemy.moves)
                 enemy_damage = max((self.enemy.attack * moves_data[enemy_move]["power"]) // 10 - self.player.defense,1)
+                enemy_multiplier = type_chart.get(moves_data[enemy_move]["type"], {}).get(self.player.type, 1.0)
+                enemy_damage = int(enemy_damage * enemy_multiplier)
                 damage = max((self.player.attack * moves_data[move_name]["power"]) // 10 - self.enemy.defense, 1)
+                multiplyer = type_chart.get(moves_data[move_name]["type"], {}).get(self.enemy.type,1.0)
+                damage = int(damage * multiplyer)
                 self.player.hp -= enemy_damage
                 self.enemy.hp -= damage
                 self.message = f"{self.player.name} used {move_name} with {damage} damage! | {self.enemy.name} used {enemy_move} with {enemy_damage} damage!"
@@ -197,7 +243,7 @@ class Battle(Scene):
         if self.battle_over:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 if not self.player.is_alive():
-                    self.player.hp = characters["reggie"]["hp"]
+                    self.player.hp = characters["player"]["hp"]
                     GAME_MAP.clear()
                     GAME_MAP.extend(build_map())
                     background.x = 64
@@ -206,12 +252,30 @@ class Battle(Scene):
                 else:
                     manager.goto_scene(background)
 
-title = Title()
+class Dialogue(Scene):
+    def __init__(self, lines, next_scene):
+        self.current_line = 0
+        self.lines = lines
+        self.next_scene = next_scene
+        self.dialogue_text = pygame.font.Font(None, 18)
+    def draw(self, screen):
+        screen.fill((32, 46, 12))
+        text = self.dialogue_text.render(self.lines[self.current_line], True, (255, 255, 255))
+        screen.blit(text, (50, 50))
+    def handle_event(self, event):
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            self.current_line += 1
+            if self.current_line >= len(self.lines):
+                manager.goto_scene(self.next_scene)
+
 
 background = Background()
-
+title = Title()
 manager = SceneManager(title)
-battle = Battle(reggie, skivvy)
+intro = Dialogue(dialogue_data["wendy_intro"], background)
+
+
+battle = Battle(player, skivvy)
 
 running = True
 while running:

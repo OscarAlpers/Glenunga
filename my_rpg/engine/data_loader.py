@@ -7,3 +7,8 @@ def load_characters():
 def load_moves():
     with open("data/moves.json") as f:
         return json.load(f)
+
+def load_dialogue():
+    with open("data/dialogue.json") as f:
+        return json.load(f)
+
