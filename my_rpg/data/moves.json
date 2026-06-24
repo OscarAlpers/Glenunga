@@ -68,5 +68,25 @@
         "name": "Squeal",
         "power": 1,
         "type": "neutral"
-    }
+    },
+  "sell 2g of weed for $50": {
+    "name": "Sell 2g of weed for $50",
+    "power": 7,
+    "type": "cunt"
+},
+"lead paint stare": {
+    "name": "Lead paint stare",
+    "power": 2,
+    "type": "cunt"
+},
+"retard bite": {
+    "name": "Retard bite",
+    "power": 10,
+    "type": "cunt"
+},
+"horrible vibes": {
+    "name": "Horrible vibes",
+    "power": 8,
+    "type": "cunt"
+}
 }

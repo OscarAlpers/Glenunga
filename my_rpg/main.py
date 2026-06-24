@@ -7,7 +7,7 @@ from engine.data_loader import load_characters, load_moves, load_dialogue
 from engine.scene_manager import Scene, SceneManager
 pygame.init()
 screen = pygame.display.set_mode((800, 576))
-pygame.display.set_caption("Red Box")
+pygame.display.set_caption("Glenunga")
 clock = pygame.time.Clock()
 
 SCREEN_WIDTH = 800
@@ -18,19 +18,48 @@ TILE_SIZE = 32
 MAP_COLS = 50   # 25
 MAP_ROWS = 36   # 18
 
+story_progress = 0
+
 TILE_COLORS = {
     0: (222, 184, 135),     # floor
+    2:(163, 7, 18), #fake battle floor
     1: (44, 53, 74),    # wall
+    99:(0,0,0), #void
+    10:(102, 56, 0), #desk
+    9: (63, 70, 92),      # door
+    90:(63, 70, 92), #door2
+
+    #SPECIAL TILE
+    500: (0,200,255),
+
+
+    #NPC
+    400: (0, 102, 29), #An
+    401: (0, 102, 29), #Sam
+    410: (0, 102, 29), #BenMiles
+
+
+    #FIGHTS
     3: (181, 72, 80),      # eshay fight
     101: (163, 7, 18),     # nick fight
     102: (163, 7, 18), #dev fight
-    9: (222, 184, 135),      # door
+    103: (222, 184, 135), #Luka Fight scene
+
+
+
 }
+npcs = {
+    400: "an_intro",
+    410: "ben_miles"
+
+}
+
+npc_tiles = {400, 401, 410}
 
 enemies = {
     3: "random_eshay",
     101: "nick",
-    102: "dev"
+    102: "dev",
 }
 type_chart = {
     "dickhead": {"cunt": 1.5, "sket": 0.5},
@@ -43,6 +72,12 @@ type_chart = {
     "sket": {"nerd": 1.5, "cunt": 1.5, "sporty": 1.5, "dickhead": 0.5},
     "loser": {"prefect":0.5, "stoner" : 1.5},
     "behemoth": {"sporty": 1.5, "sket": 1.5, "eshay": 1.5}
+}
+walls = {1, 10, 11, 12,99}
+doors = {
+    9: {"area": "hallway", "x": 8, "y": 32},
+    90: {"area": "homegroup", "x": 19, "y": 11},
+    51: {"area": "map1", "x": 2, "y": 5},
 }
 
 def build_map(area="map1"):
@@ -81,16 +116,120 @@ def build_map(area="map1"):
         game_map[24][49] = 9
         game_map[23][49] = 9
         game_map[25][49] = 9
-    elif area == "map2":
-        game_map[13][0] = 0
-        game_map[14][0] = 0
-        game_map[15][0] = 0
-        game_map[3][24] = 9
-        game_map[4][24] = 9
-        game_map[5][24] = 9
-        game_map[10][4] = 102
+    elif area == "hallway":
+        for row in range(MAP_ROWS):
+            for col in range(MAP_COLS):
+                game_map[row][col] = 99
+
+            # vertical hallway
+        for row in range(1, 34):
+            for col in range(8, 14):
+                game_map[row][col] = 0
+
+            # door on the right side (entry from homegroup)
+        game_map[32][7] = 90
+        game_map[33][7] = 90
+
+        # door at the top (to next area)
+        game_map[0][10] = 51
+        game_map[0][11] = 51
+
+        #fight scene
+        game_map[11][13] = 2
+        game_map[15][8] = 103
+        game_map[15][9] = 103
+        game_map[15][10] = 103
+        game_map[15][11] = 103
+        game_map[15][12] = 103
+        game_map[15][13] = 103
+        # Bathroom entrance (open the hallway wall)
+        game_map[4][14] = 0
+        game_map[5][14] = 0
+
+        # Bathroom room
+        for row in range(2, 8):
+            for col in range(15, 24):
+                game_map[row][col] = 0
+
+        # Cubicle walls
+        for row in range(2, 5):
+            game_map[row][17] = 1
+        for row in range(2, 5):
+            game_map[row][20] = 1
+
+        # Cubicle doors (gaps at the bottom)
+        game_map[4][17] = 0
+        game_map[4][20] = 0
+
+        # Heal trigger in middle cubicle
+        game_map[2][18] = 501
+
+
+        #SAM
+        game_map[5][12] = 401
+    elif area == "homegroup":
+        for row in range(MAP_ROWS):
+            for col in range(MAP_COLS):
+                game_map[row][col] = 99
+
+        # carve out the room (say 12 wide, 10 tall, centered)
+        start_col = 1
+        start_row = 1
+        for row in range(start_row, start_row + 14):
+            for col in range(start_col, start_col + 20):
+                game_map[row][col] = 0
+
+            #DOOR
+        game_map[12][21] = 9
+        game_map[11][21] = 9
+
+        # Teacher's desk (wider, at the front)
+        game_map[2][6] = 10
+        game_map[2][7] = 10
+        game_map[2][5] = 10
+        game_map[2][8] = 10
+
+        # Teacher NPC behind the desk
+        game_map[1][6] = 410
+
+
+        game_map[5][3] = 10
+        game_map[5][4] = 10
+        game_map[5][5] = 10
+        game_map[6][4] = 400
+
+        # Desk 3
+        game_map[8][3] = 10
+        game_map[8][4] = 10
+        game_map[8][5] = 10
+        game_map[9][4] = 400
+
+        # Desk 4
+        game_map[11][3] = 10
+        game_map[11][4] = 10
+        game_map[11][5] = 10
+        game_map[12][4] = 400
+
+        # Right column of desks
+        # Desk 6
+        game_map[5][8] = 10
+        game_map[5][9] = 10
+        game_map[5][10] = 10
+        game_map[6][9] = 400
+
+        # Desk 7
+        game_map[8][8] = 10
+        game_map[8][9] = 10
+        game_map[8][10] = 10
+        game_map[9][9] = 400
+
+        # Desk 8
+        game_map[11][8] = 10
+        game_map[11][9] = 10
+        game_map[11][10] = 10
+        game_map[12][9] = 400
     return game_map
-GAME_MAP = build_map()
+GAME_MAP = build_map("homegroup")
 
 
 moves_data = load_moves()
@@ -114,7 +253,7 @@ class Title(Scene):
         pass
     def draw(self, screen):
         screen.fill((0, 0, 0))
-        text_image = self.font.render("Red Box", True, (255, 255, 255))
+        text_image = self.font.render("Glenunga", True, (255, 255, 255))
         screen.blit(text_image, (300, 250))
         start_button = self.small_font.render("Press Space to Start", True, (255, 255, 255))
         screen.blit(start_button, (299, 350))
@@ -125,6 +264,7 @@ class Background(Scene):
         self.y = 64
         self.camera_x = 0
         self.camera_y = 0
+        self.npc_cooldown = False
     def draw(self, screen):
         screen.fill((0, 0, 0))
         for row_index, row in enumerate(GAME_MAP):
@@ -134,13 +274,20 @@ class Background(Scene):
                 color = TILE_COLORS.get(col, (50, 100, 255))
                 pygame.draw.rect(screen, color, (x, y, TILE_SIZE, TILE_SIZE))
         pygame.draw.rect(screen, (48, 54, 240), (self.x - self.camera_x, self.y - self.camera_y, PLAYER_SIZE, PLAYER_SIZE))
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        hover_col = (mouse_x + self.camera_x) // TILE_SIZE
+        hover_row = (mouse_y + self.camera_y) // TILE_SIZE
+        font = pygame.font.Font(None, 24)
+        label = font.render(f"row:{hover_row} col:{hover_col}", True, (255, 255, 0))
+        screen.blit(label, (mouse_x + 10, mouse_y + 10))
     def is_walkable(self, x, y):
         col = x // TILE_SIZE
         row = y // TILE_SIZE
         if row < 0 or row >= MAP_ROWS or col < 0 or col >= MAP_COLS:
             return False
-        return GAME_MAP[row][col] != 1
+        return GAME_MAP[row][col] not in walls
     def update(self):
+        global story_progress
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             new_x = self.x - PLAYER_SPEED
@@ -178,11 +325,56 @@ class Background(Scene):
             new_battle = Battle(player, enemy)
             manager.goto_scene(new_battle)
 
-        elif tile_value == 9:
+        if tile_value in doors:
+            door = doors[tile_value]
             GAME_MAP.clear()
-            GAME_MAP.extend(build_map("map2"))
-            self.x = TILE_SIZE
-            self.y = 14 * TILE_SIZE
+            GAME_MAP.extend(build_map(door["area"]))
+            self.x = door["x"] * TILE_SIZE
+            self.y = door["y"] * TILE_SIZE
+
+        if tile_value == 103: #luka scene
+            for r in range(MAP_ROWS):
+                for c in range(MAP_COLS):
+                    if GAME_MAP[r][c] == 103:
+                        GAME_MAP[r][c] = 0
+            enemy = Fighter(characters["luka"])
+            fight = Battle(player,enemy)
+            fight.scripted_loss = True
+            convo = Dialogue(dialogue_data["luka_fight"], fight)
+            manager.goto_scene(convo)
+
+        if tile_value == 401 and not self.npc_cooldown:
+            self.npc_cooldown = True
+            if story_progress == 0:
+                convo = Dialogue(dialogue_data["sam_intro"], background)
+            elif story_progress == 1:
+                convo = Dialogue(dialogue_data["sam_heal"], background, background)
+            elif story_progress == 2:
+                convo = Dialogue(dialogue_data["sam_tennis"], background, background)
+            manager.goto_scene(convo)
+
+
+        if tile_value in npcs and not self.npc_cooldown:
+            self.npc_cooldown = True
+            lines = dialogue_data[npcs[tile_value]]
+            convo = Dialogue(lines, background,background)
+            manager.goto_scene(convo)
+        if tile_value not in npc_tiles:
+            self.npc_cooldown = False
+
+        if tile_value == 501:
+            GAME_MAP[tile_row][tile_column] = 0
+            story_progress = 2
+            player.hp = characters["player"]["hp"]
+            convo = Dialogue(["You watch the Inbetweeners 2 on the toilet... HP fully restored."], background)
+
+            manager.goto_scene(convo)
+        if tile_value == 500:
+            GAME_MAP[tile_row][tile_column] = 0
+            player.hp = characters["player"]["hp"]
+            convo = Dialogue(["You watch the Inbetweeners 2 on the toilet... HP fully restored."], background)
+
+            manager.goto_scene(convo)
 
 
 class Battle(Scene):
@@ -194,18 +386,32 @@ class Battle(Scene):
         self.battle_font = pygame.font.Font(None, 24)
         self.selected = 0
         self.battle_over = False
+        self.scripted_loss = False
+        self.enemy_max_hp = self.enemy.hp
     def draw(self, screen):
         screen.fill((32, 46, 12))
         text = self.small_font.render(f"{self.player.name} HP: {self.player.hp}", True, (255, 255, 255))
         screen.blit(text, (50, 50))
         text = self.small_font.render(f"{self.enemy.name} HP: {self.enemy.hp}", True, (255, 255, 255))
         screen.blit(text, (500, 50))
+        # Player health bar
+        bar_width = 200
+        bar_height = 20
+        bar_x = 50
+        bar_y = 80
+        pygame.draw.rect(screen, (255, 0, 0), (bar_x, bar_y, bar_width, bar_height))
+        green_width = int(bar_width * (self.player.hp / characters["player"]["hp"]))
+        pygame.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, green_width, bar_height))
+        bar_x = 500
+        green_width = int(bar_width * (self.enemy.hp / self.enemy_max_hp))
+        pygame.draw.rect(screen, (255, 0, 0), (bar_x, bar_y, bar_width, bar_height))
+        pygame.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, green_width, bar_height))
         for i, move in enumerate(self.player.moves):
             if i == self.selected:
                 color = (255, 255, 0)
             else:
                 color = (255, 255, 255)
-            move_text = self.small_font.render(move, True, color)
+            move_text = self.small_font.render(moves_data[move]["name"], True, color)
             screen.blit(move_text, (50,200 + i * 40))
         text = self.battle_font.render(self.message, True, (255, 255, 255))
         screen.blit(text, (50, 460))
@@ -233,16 +439,27 @@ class Battle(Scene):
                 damage = int(damage * multiplyer)
                 self.player.hp -= enemy_damage
                 self.enemy.hp -= damage
-                self.message = f"{self.player.name} used {move_name} with {damage} damage! | {self.enemy.name} used {enemy_move} with {enemy_damage} damage!"
-                if not self.enemy.is_alive():
-                    self.message = f"{self.enemy.name} is dead! Press SPACE to continue."
-                    self.battle_over = True
+                self.message = f"{self.player.name} used {moves_data[move_name]['name']} with {damage} damage! | {self.enemy.name} used {moves_data[enemy_move]['name']} with {enemy_damage} damage!"
+                if not self.player.is_alive():
+                    if self.scripted_loss:
+                        global story_progress
+                        story_progress = 1
+                        self.player.hp = 1
+                        self.message = "This year 9 just fucked you up... Press SPACE to continue."
+                        self.battle_over = True
+                    else:
+                        self.message = f"{self.player.name} is dead! Press SPACE to continue."
+                        self.battle_over = True
                 if not self.player.is_alive():
                     self.message = f"{self.player.name} is dead! Press SPACE to continue."
                     self.battle_over = True
         if self.battle_over:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                if not self.player.is_alive():
+                if self.scripted_loss and self.player.is_alive():
+                    # continue story - Sam finds you
+                    convo = Dialogue(dialogue_data["sam_intro"], background)
+                    manager.goto_scene(convo)
+                elif not self.player.is_alive():
                     self.player.hp = characters["player"]["hp"]
                     GAME_MAP.clear()
                     GAME_MAP.extend(build_map())
@@ -253,15 +470,28 @@ class Battle(Scene):
                     manager.goto_scene(background)
 
 class Dialogue(Scene):
-    def __init__(self, lines, next_scene):
+    def __init__(self, lines, next_scene, bg_scene=None):
         self.current_line = 0
         self.lines = lines
         self.next_scene = next_scene
-        self.dialogue_text = pygame.font.Font(None, 18)
+        self.bg_scene = bg_scene
+        self.font = pygame.font.Font(None, 32)
     def draw(self, screen):
-        screen.fill((32, 46, 12))
-        text = self.dialogue_text.render(self.lines[self.current_line], True, (255, 255, 255))
-        screen.blit(text, (50, 50))
+        if self.bg_scene:
+            self.bg_scene.draw(screen)
+        else:
+            screen.fill((0, 0, 0))
+        # dark box at the bottom
+        box_height = 120
+        box_y = SCREEN_HEIGHT - box_height
+        pygame.draw.rect(screen, (20, 20, 20), (10, box_y, SCREEN_WIDTH - 20, box_height))
+        pygame.draw.rect(screen, (255, 255, 255), (10, box_y, SCREEN_WIDTH - 20, box_height), 2)
+        # text inside the box
+        text = self.font.render(self.lines[self.current_line], True, (255, 255, 255))
+        screen.blit(text, (30, box_y + 20))
+        # prompt
+        prompt = self.font.render("SPACE >", True, (150, 150, 150))
+        screen.blit(prompt, (SCREEN_WIDTH - 120, box_y + box_height - 35))
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
             self.current_line += 1
@@ -269,13 +499,17 @@ class Dialogue(Scene):
                 manager.goto_scene(self.next_scene)
 
 
+
+
 background = Background()
+
+
 title = Title()
 manager = SceneManager(title)
 intro = Dialogue(dialogue_data["wendy_intro"], background)
 
 
-battle = Battle(player, skivvy)
+
 
 running = True
 while running:

@@ -26,13 +26,23 @@
     },
 
     "dev": {
-        "name" : "Dev",
-        "type" : "sporty",
-        "hp" : 10,
-        "attack" : 10,
-        "defense": 1,
-        "moves" : ["bicycle kick", "sprint"]
-
+      "name": "Dev",
+      "type": "sporty",
+      "hp": 10,
+      "attack": 10,
+      "defense": 1,
+      "moves": [
+        "bicycle kick",
+        "sprint"
+      ]
+    },
+    "luka": {
+      "name" :" Luka Jackaway",
+      "type" : "cunt",
+      "hp": 50,
+      "attack": 20,
+      "defense": 30,
+      "moves": ["sell 2g of weed for $50", "lead paint stare", "retard bite", "horrible vibes"]
 
     },
     "nick": {
@@ -43,4 +53,5 @@
         "defense": 5,
         "moves" : ["bong rip", "bong smash", "bali threesome story","keef and stem"]
     }
+
 }

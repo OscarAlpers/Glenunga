@@ -1,12 +1,41 @@
 {
     "wendy_intro": [
-        "Welcome to Glenunga class.",
-        "I'm Mrs Johnson, your homegroup teacher.",
-        "Find a seat and settle in."
+        "Hello Year 8s, welcome to Glenunga.",
+        "I'm Mrs Johnson, your Principal.",
+        "Im going to ensure everyone here achieves their personal best.",
+        "Now head off to your homegroups, your teachers are waiting."
     ],
     "sam_intro": [
         "Hey, you alright?",
         "Those year 9s are rough.",
         "Come with me, I know where you can rest."
-    ]
+    ],
+  "sam_heal": [
+    "You can relax in the bathrooms for a bit while you recover",
+    "Just bring in something to do or watch while you pass the time",
+    "Go have a seat over there then come and talk to me once your done"
+  ],
+  "sam_tennis": [
+    "Are you feeling better?",
+    "you should come with me to the tennis courts",
+    "The tennis court boys are so sick",
+    "and they know what its like to get monstered",
+    "Come play some handball with us",
+    "its much safer than hanging around here",
+    "Just up here I'll show you"
+  ],
+    "an_intro": [
+      "My names An Nguyen",
+      "This homegroup teacher is such a fucking penis"
+    ],
+  "ben_miles": [
+    "Welcome to my class! Dont I look like Dave Grohl? haha",
+    "Im not a penis im a man",
+    "You need a movement card if you want to leave this room buddy",
+    "Sit down and do some work!"
+  ],
+  "luka_fight":[
+    "hey faggot come here",
+    "im a fucking retard and i want to fuck you up",
+  "welcome to nunga cunt"]
 }
