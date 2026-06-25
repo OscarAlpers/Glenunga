@@ -21,13 +21,16 @@ MAP_ROWS = 36   # 18
 story_progress = 0
 
 TILE_COLORS = {
-    0: (222, 184, 135),     # floor
+    0: (222, 184, 135),     # woodfloor
+    4: (84, 99, 128), #asphalt
     2:(163, 7, 18), #fake battle floor
+    5: (222, 223, 227), #whiteWalkable
     1: (44, 53, 74),    # wall
     99:(0,0,0), #void
     10:(102, 56, 0), #desk
     9: (63, 70, 92),      # door
     90:(63, 70, 92), #door2
+    50 : (63, 70, 92),   # tennis court door
 
     #SPECIAL TILE
     500: (0,200,255),
@@ -44,8 +47,11 @@ TILE_COLORS = {
     101: (163, 7, 18),     # nick fight
     102: (163, 7, 18), #dev fight
     103: (222, 184, 135), #Luka Fight scene
-
-
+    #Tennis Court Fights
+    104: (163, 7, 18),
+    105: (163, 7, 18),
+    106: (163, 7, 18),
+    107: (163, 7, 18),
 
 }
 npcs = {
@@ -60,24 +66,29 @@ enemies = {
     3: "random_eshay",
     101: "nick",
     102: "dev",
+    104: "jack_ac",
+    105: "daniel_rustia",
+    106: "arsh",
+    107: "zenan"
 }
 type_chart = {
-    "dickhead": {"cunt": 1.5, "sket": 0.5},
-    "nerd": {"sporty": 1.5, "cunt": 0.5, "sket": 0.5},
-    "sporty": {"eshay": 1.5},
-    "stoner": {},
-    "eshay": {"nerd": 1.5, "sporty": 0.5},
-    "prefect": {"cunt": 1.5, "eshay": 1.5},
-    "cunt": {"nerd": 1.5, "prefect": 0.5},
-    "sket": {"nerd": 1.5, "cunt": 1.5, "sporty": 1.5, "dickhead": 0.5},
-    "loser": {"prefect":0.5, "stoner" : 1.5},
-    "behemoth": {"sporty": 1.5, "sket": 1.5, "eshay": 1.5}
+    "dickhead": {"cunt": 1.5, "sket": 0.5}, #clown type - water
+    "nerd": {"sporty": 1.5, "cunt": 0.5, "sket": 0.5}, #techy - steel, electric
+    "sporty": {"eshay": 1.5}, #physical - fighting flying, grass
+    "stoner": {}, #lazy - fire, poison
+    "eshay": {"nerd": 1.5, "sporty": 0.5}, #rodent - ghost, dark
+    "prefect": {"cunt": 1.5, "eshay": 1.5}, #like light whatever - fairy
+    "cunt": {"nerd": 1.5, "prefect": 0.5}, #bully - rock, ground
+    "sket": {"nerd": 1.5, "cunt": 1.5, "sporty": 1.5, "dickhead": 0.5}, # whoring - psychic
+    "loser": {"prefect":0.5, "stoner" : 1.5}, # common - bug type
+    "behemoth": {"sporty": 1.5, "sket": 1.5, "eshay": 1.5} # dragon type
 }
 walls = {1, 10, 11, 12,99}
 doors = {
     9: {"area": "hallway", "x": 8, "y": 32},
     90: {"area": "homegroup", "x": 19, "y": 11},
-    51: {"area": "map1", "x": 2, "y": 5},
+    50: {"area": "hallway", "x": 10, "y": 2},
+    51: {"area": "tenniscourt", "x": 2, "y": 34},
 }
 
 def build_map(area="map1"):
@@ -135,7 +146,7 @@ def build_map(area="map1"):
         game_map[0][11] = 51
 
         #fight scene
-        game_map[11][13] = 2
+        game_map[14][13] = 2
         game_map[15][8] = 103
         game_map[15][9] = 103
         game_map[15][10] = 103
@@ -180,8 +191,8 @@ def build_map(area="map1"):
                 game_map[row][col] = 0
 
             #DOOR
-        game_map[12][21] = 9
-        game_map[11][21] = 9
+        game_map[12][21] = 9 #change to 51 for TCourt Testing
+        game_map[11][21] = 9 #change to 9 for real narative
 
         # Teacher's desk (wider, at the front)
         game_map[2][6] = 10
@@ -228,6 +239,119 @@ def build_map(area="map1"):
         game_map[11][9] = 10
         game_map[11][10] = 10
         game_map[12][9] = 400
+
+    elif area == "tenniscourt":
+        for row in range(MAP_ROWS):
+            for col in range(MAP_COLS):
+                game_map[row][col] = 4
+
+        # perimeter
+        for col in range(0, 50):
+            game_map[0][col] = 1
+            game_map[35][col] = 1
+        for row in range(0, 36):
+            game_map[row][0] = 1
+            game_map[row][49] = 1
+
+        # === SECTION 1: Narrow entrance path (rows 30-34) ===
+        for row in range(30, 35):
+            for col in range(1, 12):
+                game_map[row][col] = 4
+
+        # entrance door
+        game_map[35][2] = 50
+        game_map[35][3] = 50
+
+        # Sam near entrance
+        game_map[33][6] = 401
+
+        # === SECTION 2: Wide court area (rows 20-29) ===
+        for row in range(20, 30):
+            for col in range(1, 49):
+                game_map[row][col] = 4
+
+        # court 1 lines (walkable)
+        for col in range(4, 22):
+            game_map[21][col] = 5
+            game_map[28][col] = 5
+        for row in range(21, 29):
+            game_map[row][4] = 5
+            game_map[row][21] = 5
+            game_map[row][13] = 5
+
+        # court 2 lines (walkable)
+        for col in range(26, 46):
+            game_map[21][col] = 5
+            game_map[28][col] = 5
+        for row in range(21, 29):
+            game_map[row][26] = 5
+            game_map[row][45] = 5
+            game_map[row][36] = 5
+
+        # mid fights scattered around courts
+        game_map[24][12] = 104
+        game_map[24][36] = 105
+        game_map[26][20] = 106
+        game_map[26][42] = 107
+
+        # wall separating section 2 from 3, gap in middle
+        for col in range(1, 20):
+            game_map[19][col] = 1
+        for col in range(28, 49):
+            game_map[19][col] = 1
+        game_map[19][23] = 105
+        game_map[19][24] = 105
+
+        # === SECTION 3: Two narrow corridors side by side (rows 10-18) ===
+        # left corridor
+        for row in range(10, 19):
+            for col in range(1, 12):
+                game_map[row][col] = 4
+
+        # right corridor
+        for row in range(10, 19):
+            for col in range(38, 49):
+                game_map[row][col] = 4
+
+        # fights in left corridor
+        game_map[16][5] = 105
+        game_map[13][8] = 106
+        game_map[11][3] = 106
+
+        # fights in right corridor
+        game_map[16][42] = 105
+        game_map[13][44] = 106
+        game_map[11][40] = 106
+
+        # both corridors connect to top area
+        # wall with two gaps
+        for col in range(1, 49):
+            game_map[9][col] = 1
+        game_map[9][5] = 4
+        game_map[9][6] = 4
+        game_map[9][42] = 4
+        game_map[9][43] = 4
+
+        # === SECTION 4: Top court - boss area (rows 1-8) ===
+        for row in range(1, 9):
+            for col in range(1, 49):
+                game_map[row][col] = 4
+
+        # court lines
+        for col in range(15, 35):
+            game_map[2][col] = 5
+            game_map[7][col] = 5
+        for row in range(2, 8):
+            game_map[row][15] = 5
+            game_map[row][34] = 5
+            game_map[row][25] = 5
+
+        # tough fights guarding boss
+        game_map[6][10] = 106
+        game_map[6][40] = 106
+
+        # boss at top center
+        game_map[2][24] = 107
     return game_map
 GAME_MAP = build_map("homegroup")
 
@@ -236,7 +360,8 @@ moves_data = load_moves()
 characters = load_characters()
 dialogue_data = load_dialogue()
 player = Fighter(characters["player"])
-skivvy = Fighter(characters["random_eshay"])
+party = [player]
+sam = Fighter(characters["sam"])
 
 
 class Title(Scene):
@@ -265,6 +390,10 @@ class Background(Scene):
         self.camera_x = 0
         self.camera_y = 0
         self.npc_cooldown = False
+        self.floor_tile = 0
+    def handle_event(self, event):
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
+            manager.goto_scene(partymenu)
     def draw(self, screen):
         screen.fill((0, 0, 0))
         for row_index, row in enumerate(GAME_MAP):
@@ -320,9 +449,9 @@ class Background(Scene):
         self.camera_y = self.y - SCREEN_HEIGHT // 2
 
         if tile_value in enemies:
-            GAME_MAP[tile_row][tile_column] = 0
+            GAME_MAP[tile_row][tile_column] = self.floor_tile
             enemy = Fighter(characters[enemies[tile_value]])
-            new_battle = Battle(player, enemy)
+            new_battle = Battle(party[0], enemy)
             manager.goto_scene(new_battle)
 
         if tile_value in doors:
@@ -331,6 +460,10 @@ class Background(Scene):
             GAME_MAP.extend(build_map(door["area"]))
             self.x = door["x"] * TILE_SIZE
             self.y = door["y"] * TILE_SIZE
+            if door["area"] == "tenniscourt":
+                self.floor_tile = 4
+            else:
+                self.floor_tile = 0
 
         if tile_value == 103: #luka scene
             for r in range(MAP_ROWS):
@@ -340,7 +473,7 @@ class Background(Scene):
             enemy = Fighter(characters["luka"])
             fight = Battle(player,enemy)
             fight.scripted_loss = True
-            convo = Dialogue(dialogue_data["luka_fight"], fight)
+            convo = Dialogue(dialogue_data["luka_fight"], fight, background)
             manager.goto_scene(convo)
 
         if tile_value == 401 and not self.npc_cooldown:
@@ -350,7 +483,14 @@ class Background(Scene):
             elif story_progress == 1:
                 convo = Dialogue(dialogue_data["sam_heal"], background, background)
             elif story_progress == 2:
+                story_progress = 3
                 convo = Dialogue(dialogue_data["sam_tennis"], background, background)
+            elif story_progress == 3:
+                story_progress = 4
+                player.moves.append("lightning lob")
+                party.append(sam)
+                convo = Dialogue(dialogue_data["sam_lightning"], background, background)
+
             manager.goto_scene(convo)
 
 
@@ -441,17 +581,31 @@ class Battle(Scene):
                 self.enemy.hp -= damage
                 self.message = f"{self.player.name} used {moves_data[move_name]['name']} with {damage} damage! | {self.enemy.name} used {moves_data[enemy_move]['name']} with {enemy_damage} damage!"
                 if not self.player.is_alive():
-                    if self.scripted_loss:
+                    next_fighter = None
+                    for i, member in enumerate(party):
+                        if member.is_alive() and member is not self.player:
+                            next_fighter = member
+                            # move them to front of party
+                            party.pop(i)
+                            party.insert(0, member)
+                            break
+                    if next_fighter:
+                        self.player = next_fighter
+                        self.selected = 0
+                        self.message = f"{next_fighter.name} steps in!"
+                    elif self.scripted_loss:
                         global story_progress
                         story_progress = 1
                         self.player.hp = 1
-                        self.message = "This year 9 just fucked you up... Press SPACE to continue."
+                        self.message = "This cunt just fucked you up..."
                         self.battle_over = True
                     else:
-                        self.message = f"{self.player.name} is dead! Press SPACE to continue."
+                        self.message = f"{self.player.name} is dead!"
                         self.battle_over = True
-                if not self.player.is_alive():
-                    self.message = f"{self.player.name} is dead! Press SPACE to continue."
+                if not self.enemy.is_alive():
+                    xp_gained = self.enemy.level * 5 if hasattr(self.enemy, "level") else 10
+                    self.player.gain_xp(xp_gained)
+                    self.message = f"You've killed {self.enemy.name}  +{xp_gained} XP."
                     self.battle_over = True
         if self.battle_over:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
@@ -468,6 +622,48 @@ class Battle(Scene):
                     manager.goto_scene(title)
                 else:
                     manager.goto_scene(background)
+
+class PartyMenu(Scene):
+    def __init__(self):
+        self.selected = 0
+        self.font = pygame.font.Font(None, 32)
+        self.small_font = pygame.font.Font(None, 24)
+    def draw(self, screen):
+        screen.fill((20, 20, 40))
+        title = self.font.render("Party", True, (255, 255, 255))
+        screen.blit(title, (50, 20))
+        for i, member in enumerate(party):
+            if i == self.selected:
+                color = (255, 255, 0)
+            else:
+                color = (255, 255, 255)
+            name = self.font.render(f"{member.name} Lv.{member.level} {member.type}", True, color)
+            screen.blit(name, (50, 80 + i * 80))
+            stats = self.small_font.render(f"HP: {member.hp}  ATK: {member.attack}  DEF: {member.defense}", True, (180, 180, 180))
+            screen.blit(stats, (50, 110 + i * 80))
+            # health bar
+            bar_width = 150
+            green_width = int(bar_width * max(member.hp, 0) / member.max_hp)
+            pygame.draw.rect(screen, (255, 0, 0), (300, 85 + i * 80, bar_width, 15))
+            pygame.draw.rect(screen, (0, 255, 0), (300, 85 + i * 80, green_width, 15))
+        prompt = self.small_font.render("ENTER = set active  |  ESC = back", True, (150, 150, 150))
+        screen.blit(prompt, (50, SCREEN_HEIGHT - 40))
+    def handle_event(self, event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_DOWN:
+                self.selected = min(self.selected + 1, len(party) - 1)
+            elif event.key == pygame.K_UP:
+                self.selected = max(self.selected - 1, 0)
+            elif event.key == pygame.K_RETURN:
+                # move selected member to front
+                if party[self.selected].is_alive():
+                    member = party.pop(self.selected)
+                    party.insert(0, member)
+                    self.selected = 0
+                else:
+                    self.message = "That party member is dead!"
+            elif event.key == pygame.K_ESCAPE:
+                manager.goto_scene(background)
 
 class Dialogue(Scene):
     def __init__(self, lines, next_scene, bg_scene=None):
@@ -507,6 +703,7 @@ background = Background()
 title = Title()
 manager = SceneManager(title)
 intro = Dialogue(dialogue_data["wendy_intro"], background)
+partymenu = PartyMenu()
 
 
 

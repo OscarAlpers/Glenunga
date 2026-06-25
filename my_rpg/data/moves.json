@@ -21,12 +21,12 @@
     },
     "weak punch": {
         "name": "Weak punch",
-        "power": 40,
+        "power": 3,
         "type": "neutral"
     },
     "throw rubbish": {
         "name": "Throw rubbish",
-        "power": 60,
+        "power": 1,
         "type": "neutral"
     },
     "bicycle kick": {
@@ -88,5 +88,35 @@
     "name": "Horrible vibes",
     "power": 8,
     "type": "cunt"
+},
+  "lightning lob": {
+    "name": "Lightning Lob",
+    "power": 10,
+    "type" : "nerd"
+  },
+  "tennis serve": {
+    "name": "Tennis Serve",
+    "power": 3,
+    "type": "nerd"
+},
+"smack with laptop": {
+    "name": "Smack with Laptop",
+    "power": 6,
+    "type": "nerd"
+},
+"7.0 GPA": {
+    "name": "7.0 GPA",
+    "power": 4,
+    "type": "nerd"
+},
+  "hackerman": {
+    "name": "Hackerman",
+    "power": 10,
+    "type": "nerd"
+},
+"gingervitis": {
+    "name": "Gingervitis",
+    "power": 7,
+    "type": "nerd"
 }
 }

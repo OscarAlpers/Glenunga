@@ -1,12 +1,24 @@
 {
         "player": {
     "name": "Player",
-    "type": "neutral",
+    "type": "Neutral",
     "hp": 40,
     "attack": 7,
     "defense": 5,
-    "moves": ["weak punch", "throw rubbish","squeal","shank"]
+          "xp": 0,
+          "level": 1,
+    "moves": ["squeal"]
     },
+  "sam": {
+    "name": "Sam",
+    "type": "Nerd",
+    "hp": 35,
+    "attack": 8,
+    "defense": 4,
+    "xp": 0,
+    "level": 1,
+    "moves": ["lightning lob", "hackerman", "gingervitis"]
+},
 
     "reggie": {
         "name": "Reggie",
@@ -52,6 +64,37 @@
         "attack": 5,
         "defense": 5,
         "moves" : ["bong rip", "bong smash", "bali threesome story","keef and stem"]
-    }
-
+    },
+  "jack_ac": {
+    "name" : "Jack Allen-Crummey",
+    "type" : "nerd",
+    "hp": 12,
+    "defense": 2,
+    "attack": 2,
+    "moves": ["weak punch","smack with laptop"]
+  },
+  "arsh": {
+    "name" : "Arsh Bal",
+    "type" : "nerd",
+    "hp": 12,
+    "defense": 2,
+    "attack": 6,
+    "moves": ["tennis serve","smack with laptop", "7.0 GPA"]
+  },
+"zenan": {
+    "name" : "Zenan Peng",
+    "type" : "nerd",
+    "hp": 12,
+    "defense": 2,
+    "attack": 6,
+    "moves": ["tennis serve","smack with laptop", "7.0 GPA"]
+  },
+  "daniel_rustia": {
+    "name" : "Daniel Rustia",
+    "type" : "nerd",
+    "hp": 12,
+    "defense": 2,
+    "attack": 6,
+    "moves": ["tennis serve","smack with laptop", "7.0 GPA"]
+  }
 }
