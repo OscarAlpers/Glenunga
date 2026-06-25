@@ -78,7 +78,7 @@ type_chart = {
     "eshay": {"nerd": 1.5, "sporty": 0.5}, #rodent - ghost, dark
     "prefect": {"cunt": 1.5, "eshay": 1.5}, #like light whatever - fairy
     "cunt": {"nerd": 1.5, "prefect": 0.5}, #bully - rock, ground
-    "sket": {"nerd": 1.5, "cunt": 1.5, "sporty": 1.5, "dickhead": 0.5}, # whoring - psychic
+    "sket": {"nerd": 1.5, "cunt": 1.5, "sporty": 1.5, "dickhead": 0.5}, #  - psychic
     "loser": {"prefect":0.5, "stoner" : 1.5}, # common - bug type
     "behemoth": {"sporty": 1.5, "sket": 1.5, "eshay": 1.5} # dragon type
 }
@@ -190,8 +190,8 @@ def build_map(area="map1"):
                 game_map[row][col] = 0
 
             #DOOR
-        game_map[12][21] = 9 #change to 51 for TCourt Testing
-        game_map[11][21] = 9 #change to 9 for real narative
+        game_map[12][21] = 51 #change to 51 for TCourt Testing
+        game_map[11][21] = 51 #change to 9 for real narative
 
         # Teacher's desk (wider, at the front)
         game_map[2][6] = 10
@@ -288,24 +288,26 @@ def build_map(area="map1"):
             game_map[row][36] = 5
 
         # mid fights scattered around courts
-        game_map[24][12] = 104
-        game_map[24][36] = 105
-        game_map[26][20] = 106
-        game_map[26][42] = 107
+        game_map[24][9] = 104
+        game_map[23][33] = 105
+        game_map[25][17] = 106
 
         # wall separating section 2 from 3, gap in middle
-        for col in range(1, 20):
+        for col in range(1, 21):
             game_map[19][col] = 1
-        for col in range(28, 49):
+        for col in range(26, 49):
             game_map[19][col] = 1
-        game_map[19][23] = 105
-        game_map[19][24] = 105
+        game_map[19][23] = 107
 
         # === SECTION 3: Two narrow corridors side by side (rows 10-18) ===
         # left corridor
         for row in range(10, 19):
             for col in range(1, 12):
                 game_map[row][col] = 4
+
+        for row in range (11,17):
+            game_map[row][3] = 5
+
 
         # right corridor
         for row in range(10, 19):
@@ -315,7 +317,7 @@ def build_map(area="map1"):
         # fights in left corridor
         game_map[16][5] = 105
         game_map[13][8] = 106
-        game_map[11][3] = 106
+        game_map[10][5] = 106
 
         # fights in right corridor
         game_map[16][42] = 105
