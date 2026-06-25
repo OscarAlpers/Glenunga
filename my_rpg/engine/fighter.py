@@ -19,6 +19,8 @@ class Fighter:
         if self.xp >= self.level * 20:
             self.xp = 0
             self.level += 1
-            self.hp += 5
+            self.max_hp += 5
             self.attack += 2
             self.defense += 2
+            return True
+        return False

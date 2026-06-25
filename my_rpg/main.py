@@ -38,7 +38,7 @@ TILE_COLORS = {
 
     #NPC
     400: (0, 102, 29), #An
-    401: (0, 102, 29), #Sam
+    401: (0, 125, 19), #Sam
     410: (0, 102, 29), #BenMiles
 
 
@@ -55,9 +55,8 @@ TILE_COLORS = {
 
 }
 npcs = {
-    400: "an_intro",
-    410: "ben_miles"
-
+    400: {"dialogue": "an_intro", "speaker": "An Nguyen"},
+    410: {"dialogue": "ben_miles", "speaker": "Mr Miles"},
 }
 
 npc_tiles = {400, 401, 410}
@@ -473,31 +472,32 @@ class Background(Scene):
             enemy = Fighter(characters["luka"])
             fight = Battle(player,enemy)
             fight.scripted_loss = True
-            convo = Dialogue(dialogue_data["luka_fight"], fight, background)
+            convo = Dialogue(dialogue_data["luka_fight"], fight, background, speaker="Menacing Year 9")
             manager.goto_scene(convo)
 
         if tile_value == 401 and not self.npc_cooldown:
             self.npc_cooldown = True
             if story_progress == 0:
-                convo = Dialogue(dialogue_data["sam_intro"], background)
+                convo = Dialogue(dialogue_data["sam_intro"], background, speaker="Sam")
             elif story_progress == 1:
-                convo = Dialogue(dialogue_data["sam_heal"], background, background)
+                convo = Dialogue(dialogue_data["sam_heal"], background, background,speaker="Sam")
             elif story_progress == 2:
                 story_progress = 3
-                convo = Dialogue(dialogue_data["sam_tennis"], background, background)
+                convo = Dialogue(dialogue_data["sam_tennis"], background, background, speaker="Sam")
             elif story_progress == 3:
                 story_progress = 4
                 player.moves.append("lightning lob")
+                GAME_MAP[tile_row][tile_column] = 4
                 party.append(sam)
-                convo = Dialogue(dialogue_data["sam_lightning"], background, background)
+                convo = Dialogue(dialogue_data["sam_lightning"], sam_joins, background, speaker="Sam")
 
             manager.goto_scene(convo)
 
-
         if tile_value in npcs and not self.npc_cooldown:
             self.npc_cooldown = True
-            lines = dialogue_data[npcs[tile_value]]
-            convo = Dialogue(lines, background,background)
+            npc = npcs[tile_value]
+            lines = dialogue_data[npc["dialogue"]]
+            convo = Dialogue(lines, background, background, speaker=npc["speaker"])
             manager.goto_scene(convo)
         if tile_value not in npc_tiles:
             self.npc_cooldown = False
@@ -528,36 +528,57 @@ class Battle(Scene):
         self.battle_over = False
         self.scripted_loss = False
         self.enemy_max_hp = self.enemy.hp
+        self.message_1 = ""
+        self.message_2 = ""
+        self.message_3 = ""
+
     def draw(self, screen):
-        screen.fill((32, 46, 12))
-        text = self.small_font.render(f"{self.player.name} HP: {self.player.hp}", True, (255, 255, 255))
-        screen.blit(text, (50, 50))
-        text = self.small_font.render(f"{self.enemy.name} HP: {self.enemy.hp}", True, (255, 255, 255))
-        screen.blit(text, (500, 50))
-        # Player health bar
+        screen.fill((20, 20, 30))
+
+        # Player side (left)
+        name = self.small_font.render(f"{self.player.name}  Lv.{self.player.level}", True, (255, 255, 255))
+        screen.blit(name, (50, 40))
+        hp_text = self.battle_font.render(f"{max(self.player.hp, 0)} / {self.player.max_hp}", True, (200, 200, 200))
+        screen.blit(hp_text, (50, 70))
         bar_width = 200
-        bar_height = 20
-        bar_x = 50
-        bar_y = 80
-        pygame.draw.rect(screen, (255, 0, 0), (bar_x, bar_y, bar_width, bar_height))
-        green_width = int(bar_width * (self.player.hp / characters["player"]["hp"]))
-        pygame.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, green_width, bar_height))
-        bar_x = 500
-        green_width = int(bar_width * (self.enemy.hp / self.enemy_max_hp))
-        pygame.draw.rect(screen, (255, 0, 0), (bar_x, bar_y, bar_width, bar_height))
-        pygame.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, green_width, bar_height))
+        pygame.draw.rect(screen, (80, 0, 0), (50, 90, bar_width, 16))
+        green_width = int(bar_width * max(self.player.hp, 0) / self.player.max_hp)
+        pygame.draw.rect(screen, (0, 200, 0), (50, 90, green_width, 16))
+
+        # Enemy side (right)
+        name = self.small_font.render(f"{self.enemy.name}  Lv.{self.enemy.level}", True, (255, 255, 255))
+        screen.blit(name, (500, 40))
+        hp_text = self.battle_font.render(f"{max(self.enemy.hp, 0)} / {self.enemy_max_hp}", True, (200, 200, 200))
+        screen.blit(hp_text, (500, 70))
+        pygame.draw.rect(screen, (80, 0, 0), (500, 90, bar_width, 16))
+        green_width = int(bar_width * max(self.enemy.hp, 0) / self.enemy_max_hp)
+        pygame.draw.rect(screen, (0, 200, 0), (500, 90, green_width, 16))
+
+        # Divider line
+        pygame.draw.line(screen, (60, 60, 80), (0, 140), (800, 140), 1)
+
+        # Moves box (bottom left)
+        pygame.draw.rect(screen, (30, 30, 45), (30, 300, 300, 200))
+        pygame.draw.rect(screen, (80, 80, 100), (30, 300, 300, 200), 1)
+        moves_title = self.battle_font.render("MOVES", True, (150, 150, 150))
+        screen.blit(moves_title, (50, 310))
         for i, move in enumerate(self.player.moves):
             if i == self.selected:
                 color = (255, 255, 0)
             else:
                 color = (255, 255, 255)
             move_text = self.small_font.render(moves_data[move]["name"], True, color)
-            screen.blit(move_text, (50,200 + i * 40))
-        text = self.battle_font.render(self.message, True, (255, 255, 255))
-        screen.blit(text, (50, 460))
-        if self.battle_over:
-            text = self.small_font.render(self.message, True, (255, 255, 255))
-            screen.blit(text, (10, 600))
+            screen.blit(move_text, (50, 340 + i * 35))
+
+        # Message box (bottom)
+        pygame.draw.rect(screen, (30, 30, 45), (30, 510, 740, 50))
+        pygame.draw.rect(screen, (80, 80, 100), (30, 510, 740, 50), 1)
+        text1 = self.battle_font.render(self.message_1, True, (255, 255, 255))
+        screen.blit(text1, (45, 520))
+        text2 = self.battle_font.render(self.message_2, True, (255, 200, 200))
+        screen.blit(text2, (45, 540))
+        text2 = self.battle_font.render(self.message_3, True, (59, 222, 255))
+        screen.blit(text2, (45, 540))
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
             self.selected += 1
@@ -579,7 +600,8 @@ class Battle(Scene):
                 damage = int(damage * multiplyer)
                 self.player.hp -= enemy_damage
                 self.enemy.hp -= damage
-                self.message = f"{self.player.name} used {moves_data[move_name]['name']} with {damage} damage! | {self.enemy.name} used {moves_data[enemy_move]['name']} with {enemy_damage} damage!"
+                self.message_1 = f"{self.player.name} used {moves_data[move_name]['name']} - {damage} dmg"
+                self.message_2 = f"{self.enemy.name} used {moves_data[enemy_move]['name']} - {enemy_damage} dmg"
                 if not self.player.is_alive():
                     next_fighter = None
                     for i, member in enumerate(party):
@@ -597,7 +619,8 @@ class Battle(Scene):
                         global story_progress
                         story_progress = 1
                         self.player.hp = 1
-                        self.message = "This cunt just fucked you up..."
+                        self.message_1 = "This cunt just fucked you up...Press SPACE to continue."
+                        self.message_2 = ""
                         self.battle_over = True
                     else:
                         self.message = f"{self.player.name} is dead!"
@@ -605,7 +628,13 @@ class Battle(Scene):
                 if not self.enemy.is_alive():
                     xp_gained = self.enemy.level * 5 if hasattr(self.enemy, "level") else 10
                     self.player.gain_xp(xp_gained)
-                    self.message = f"You've killed {self.enemy.name}  +{xp_gained} XP."
+                    leveled = self.player.gain_xp(xp_gained)
+                    self.message_1 = f"You've killed {self.enemy.name}  +{xp_gained} XP."
+                    if leveled:
+                        self.message_2 = ""
+                        self.message_3 = f"{self.player.name} leveled up to Lv.{self.player.level}"
+                    else:
+                        self.message_2 = ""
                     self.battle_over = True
         if self.battle_over:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
@@ -666,12 +695,13 @@ class PartyMenu(Scene):
                 manager.goto_scene(background)
 
 class Dialogue(Scene):
-    def __init__(self, lines, next_scene, bg_scene=None):
+    def __init__(self, lines, next_scene, bg_scene=None, speaker=None):
         self.current_line = 0
         self.lines = lines
         self.next_scene = next_scene
         self.bg_scene = bg_scene
         self.font = pygame.font.Font(None, 32)
+        self.speaker = speaker
     def draw(self, screen):
         if self.bg_scene:
             self.bg_scene.draw(screen)
@@ -684,10 +714,22 @@ class Dialogue(Scene):
         pygame.draw.rect(screen, (255, 255, 255), (10, box_y, SCREEN_WIDTH - 20, box_height), 2)
         # text inside the box
         text = self.font.render(self.lines[self.current_line], True, (255, 255, 255))
-        screen.blit(text, (30, box_y + 20))
         # prompt
         prompt = self.font.render("SPACE >", True, (150, 150, 150))
         screen.blit(prompt, (SCREEN_WIDTH - 120, box_y + box_height - 35))
+        if self.speaker:
+            # name tab above the box
+            tab_width = max(len(self.speaker) * 14 + 20, 120)
+            pygame.draw.rect(screen, (40, 40, 50), (10, box_y - 30, tab_width, 30))
+            pygame.draw.rect(screen, (255, 255, 255), (10, box_y - 30, tab_width, 30), 2)
+            name = self.font.render(self.speaker, True, (255, 255, 0))
+            screen.blit(name, (20, box_y - 25))
+            # main text
+            text = self.font.render(self.lines[self.current_line], True, (255, 255, 255))
+            screen.blit(text, (30, box_y + 20))
+        else:
+            text = self.font.render(self.lines[self.current_line], True, (255, 255, 255))
+            screen.blit(text, (30, box_y + 20))
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
             self.current_line += 1
@@ -703,6 +745,7 @@ background = Background()
 title = Title()
 manager = SceneManager(title)
 intro = Dialogue(dialogue_data["wendy_intro"], background)
+sam_joins = Dialogue(dialogue_data["sam_joins"], background, bg_scene=background)
 partymenu = PartyMenu()
 
 

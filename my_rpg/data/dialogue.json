@@ -20,8 +20,6 @@
     "you should come with me to the tennis courts",
     "The tennis court boys are so sick",
     "and they know what its like to get monstered",
-    "Come play some handball with us",
-    "its much safer than hanging around here",
     "Just up here I'll show you"
   ],
   "sam_lightning":[
@@ -32,6 +30,9 @@
     "This move lets you serve even when the other player isn't ready!",
     "I'll come with to make sure you're doing it right"
 ],
+  "sam_joins": [
+    "Sam joins the party! Press 'P' to view the party menu"
+  ],
     "an_intro": [
       "My names An Nguyen",
       "This homegroup teacher is such a fucking penis"
